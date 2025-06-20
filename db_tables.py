@@ -12,9 +12,9 @@ class Schema:
             """
             create table order_lines (
                 id integer primary key,
-                sku varchar(256),
+                sku varchar(256) not null,
                 qty integer not null,
-                orderid varchar(256)
+                orderid varchar(256) not null
             )
             """
         )
@@ -24,8 +24,8 @@ class Schema:
             """
             create table batches (
                 id integer primary key,
-                reference varchar(255),
-                sku varchar(255),
+                reference varchar(255) unique not null,
+                sku varchar(255) not null,
                 _purchased_quantity int not null,
                 eta date
             )
