@@ -1,18 +1,13 @@
 # pytest: disable=redefined-outer-name
+import sqlite3
+
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from db_tables import metadata
+from db_tables import Schema
 
 
 @pytest.fixture
-def in_memory_db():
-    engine = create_engine("sqlite:///:memory:")
-    metadata.create_all(engine)
-    return engine
-
-
-@pytest.fixture
-def session(in_memory_db):
-    yield sessionmaker(bind=in_memory_db)()
+def session():
+    con = sqlite3.connect(":memory:")
+    Schema(con).create_all()
+    yield con

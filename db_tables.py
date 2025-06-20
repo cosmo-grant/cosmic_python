@@ -1,30 +1,44 @@
-from sqlalchemy import Table, MetaData, Column, Integer, String, Date, ForeignKey
+class Schema:
+    def __init__(self, con):
+        self._con = con
 
-metadata = MetaData()
+    def create_all(self):
+        self.create_allocations_table()
+        self.create_order_lines_table()
+        self.create_batches_table()
 
-order_lines = Table(
-    "order_lines",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("sku", String(255)),
-    Column("qty", Integer, nullable=False),
-    Column("orderid", String(255)),
-)
+    def create_order_lines_table(self):
+        self._con.execute(
+            """
+            create table order_lines (
+                id integer primary key,
+                sku varchar(256),
+                qty integer not null,
+                orderid varchar(256)
+            )
+            """
+        )
 
-batches = Table(
-    "batches",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("reference", String(255)),
-    Column("sku", String(255)),
-    Column("_purchased_quantity", Integer, nullable=False),
-    Column("eta", Date, nullable=True),
-)
+    def create_batches_table(self):
+        self._con.execute(
+            """
+            create table batches (
+                id integer primary key,
+                reference varchar(255),
+                sku varchar(255),
+                _purchased_quantity int not null,
+                eta date
+            )
+            """
+        )
 
-allocations = Table(
-    "allocations",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("orderline_id", ForeignKey("order_lines.id")),
-    Column("batch_id", ForeignKey("batches.id")),
-)
+    def create_allocations_table(self):
+        self._con.execute(
+            """
+            create table allocations (
+                id integer primary key,
+                orderline_id int references order_lines (id),
+                batch_id int references batches (id)
+            )
+            """
+        )
